@@ -1,0 +1,2 @@
+module GetterHelper
+end
