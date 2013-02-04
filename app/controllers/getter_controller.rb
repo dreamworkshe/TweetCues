@@ -1,12 +1,12 @@
 require 'twitter'
 
 class GetterController < ApplicationController
+  @@stop_words = ['a','able','about','across','after','all','almost','also','am','among','an','and','any','are','as','at','be','because','been','but','by','can','cannot','could','dear','did','do','does','either','else','ever','every','for','from','get','got','had','has','have','he','her','hers','him','his','how','however','i','if','in','into','is','it','its','just','least','let','like','likely','may','me','might','most','must','my','neither','no','nor','not','of','off','often','on','only','or','other','our','own','rather','said','say','says','she','should','since','so','some','than','that','the','their','them','then','there','these','they','this','tis','to','too','twas','us','wants','was','we','were','what','when','where','which','while','who','whom','why','will','with','would','yet','you','your']
   def get
     word = params[:word]
     freq = Hash.new()
-    Twitter.search(word, :count => 100, :result_type => "recent", :lang => "en").results.map do |status|
-      #puts status.text
-      tokens = status.text.split(/\W+/)
+    Twitter.search(word, :count => 200, :result_type => "recent", :lang => "en").results.map do |status|
+      tokens = status.text.downcase.split(/\W+/)
       tokens.each do |t|
         if freq.has_key?(t)
           freq[t] += 1
@@ -15,11 +15,15 @@ class GetterController < ApplicationController
         end
       end
     end
+    @@stop_words.each do |sw|
+      if freq.has_key? sw
+        freq.delete(sw)
+      end
+    end
     freq = freq.sort_by {|key, value| -value}
     freq_pair = freq.map do |pair|
-      {:word => pair[0], :count => pair[1]}
+      {:word => pair[0].upcase, :count => pair[1]}
     end
-    #@res = freq_pair.to_json
     render :json => freq_pair
   end
 
