@@ -18,8 +18,10 @@ class GetterController < ApplicationController
     end
     
     # delete search word
-    if freq.has_key? word
-      freq.delete(word)
+    word.split(/\W+/).each do |subword|
+      if freq.has_key? subword
+        freq.delete(subword)
+      end
     end
 
     filter_words(freq)
