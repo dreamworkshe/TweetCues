@@ -7,22 +7,29 @@ function initShow() {
       request.abort();
     }
     running = true;
-    //$("#wordcloud").attr("disabled", "disabled");
-    $("#wordcloud").empty();
+    //$("#wordCloud").attr("disabled", "disabled");
+    $("#wordCloud").empty();
     var word = $("#search_word").val();
     request = $.getJSON("/get", {word: word}, function(data) {
       var freq = [];
-      // $.each(data, function(index, pair) {
-      //   freq.push({text: pair.word, weight: pair.count});
-      // });
       for (var i = 0; i < data.length && i < 100; i++) {
         freq.push({ text: data[i].word, weight: data[i].count,
           html: { draggable: "true" }, handlers: { click:clickWord } });
       }
-      $("#wordcloud").jQCloud(freq,
+      $("#wordCloud").jQCloud(freq,
         { width: 700, height: 400,
-          afterCloudRender: function() { running = false; } });
+          afterCloudRender: function() { finishedSearch(word); } });
     });
+  };
+
+  var finishedSearch = function(word) {
+    $("#searchTrailsTitle").show();
+    var trails = $("#searchTrails");
+    if (trails.text() != '') {
+      trails.append(" -> ");
+    }
+    trails.append(word);
+    running = false;
   };
 
   var clickWord = function() {
@@ -34,7 +41,7 @@ function initShow() {
       new_search_word.substring(1,new_search_word.length).toLowerCase();
     $("#search_word").val(new_search_word);
     search();
-  }
+  };
 
   $("#search_button").click(search);
 
