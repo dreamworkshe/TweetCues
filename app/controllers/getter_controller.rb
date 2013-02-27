@@ -5,10 +5,13 @@ class GetterController < ApplicationController
   def get
     word = params[:word].downcase
     freq = Hash.new()
-    Twitter.search(word, :count => 250, :result_type => "recent", :lang => "en").results.map do |status|
+    Twitter.search(word, :count => 300, :result_type => "recent", :lang => "en").results.map do |status|
       #puts status.text
       tokens = status.text.downcase.split(/\W+/)
       tokens.each do |t|
+        if t.length <= 3
+          next
+        end
         if freq.has_key?(t)
           freq[t] += 1
         else
